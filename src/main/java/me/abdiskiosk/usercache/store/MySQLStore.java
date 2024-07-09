@@ -92,9 +92,9 @@ public class MySQLStore implements DataStore {
             stmt.setInt(1, size);
 
             List<User> users = new ArrayList<>();
-
+            ResultSet res = stmt.executeQuery();
             while(true) {
-                User user = map(stmt.executeQuery());
+                User user = map(res);
                 if(user == null) {
                     break;
                 }
