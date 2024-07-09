@@ -53,32 +53,39 @@ public class UserCacheAPI {
 
             // Get the getHandle method from the CraftPlayer class
             Method getHandleMethod = craftPlayerClass.getMethod("getHandle");
+            getHandleMethod.setAccessible(true); // Ensure the method is accessible
 
             // Invoke the getHandle method
             Object entityPlayer = getHandleMethod.invoke(craftPlayer);
 
             // Get the GameProfile using reflection
             Method getProfileMethod = entityPlayer.getClass().getMethod("getProfile");
+            getProfileMethod.setAccessible(true); // Ensure the method is accessible
             Object gameProfile = getProfileMethod.invoke(entityPlayer);
 
             // Get the properties map from the GameProfile
             Method getPropertiesMethod = gameProfile.getClass().getMethod("getProperties");
+            getPropertiesMethod.setAccessible(true); // Ensure the method is accessible
             Object properties = getPropertiesMethod.invoke(gameProfile);
 
             // Get the textures property from the properties map
             Method getMethod = properties.getClass().getMethod("get", Object.class);
+            getMethod.setAccessible(true); // Ensure the method is accessible
             Object texturesProperty = getMethod.invoke(properties, "textures");
 
             // Get the iterator of the textures property
             Method iteratorMethod = texturesProperty.getClass().getMethod("iterator");
+            iteratorMethod.setAccessible(true); // Ensure the method is accessible
             Object iterator = iteratorMethod.invoke(texturesProperty);
 
             // Get the next property from the iterator
             Method nextMethod = iterator.getClass().getMethod("next");
+            nextMethod.setAccessible(true); // Ensure the method is accessible
             Object property = nextMethod.invoke(iterator);
 
             // Get the value of the property
             Method getValueMethod = property.getClass().getMethod("getValue");
+            getValueMethod.setAccessible(true); // Ensure the method is accessible
             String texture = (String) getValueMethod.invoke(property);
 
             return texture;
