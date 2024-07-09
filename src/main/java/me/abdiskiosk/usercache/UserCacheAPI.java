@@ -15,6 +15,7 @@ import java.util.UUID;
 
 public class UserCacheAPI {
 
+    @Getter
     private static UserCacheAPI instance;
 
     @Getter
