@@ -1,7 +1,9 @@
 package me.abdiskiosk.usercache.store;
 
 import me.abdiskiosk.usercache.cache.User;
+import org.bukkit.Bukkit;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,7 +16,11 @@ public class CachedStore implements DataStore {
         this.inMem = inMem;
         this.persistent = persistent;
 
-        persistent.fetch(size).forEach(user -> inMem.update(user.getUuid(), user.getUsername(), user.getSkinTexture()));
+
+        List<User> users = persistent.fetch(size);
+        Bukkit.getLogger().info("Fetched " + users.size() + " usercache from the database.");
+
+        users.forEach(user -> inMem.update(user.getUuid(), user.getUsername(), user.getSkinTexture()));
     }
 
     @Override
