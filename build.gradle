@@ -8,6 +8,11 @@ version = '1.0-SNAPSHOT'
 repositories {
     mavenCentral()
     maven { url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/" }
+    maven { url = "https://oss.sonatype.org/content/groups/public/" }
+    maven { url = "https://repo.pyr.lol/snapshots" }
+    maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
+    maven { url = "https://maven.enginehub.org/repo/" }
+    maven { url { uri("https://storehouse.okaeri.eu/repository/maven-releases/") } }
 }
 
 dependencies {
