@@ -16,9 +16,11 @@ public class CachedStore implements DataStore {
         this.inMem = inMem;
         this.persistent = persistent;
 
-
+        long start = System.currentTimeMillis();
         List<User> users = persistent.fetch(size);
-        Bukkit.getLogger().info("Fetched " + users.size() + " usercache from the database.");
+        long end = System.currentTimeMillis();
+
+        Bukkit.getLogger().info("Fetched " + users.size() + " usercache from the database in " + (end - start) + "ms.");
 
         users.forEach(user -> inMem.update(user.getUuid(), user.getUsername(), user.getSkinTexture()));
     }
