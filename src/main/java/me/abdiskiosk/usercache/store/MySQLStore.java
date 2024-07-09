@@ -1,10 +1,8 @@
 package me.abdiskiosk.usercache.store;
 
-import com.sun.istack.internal.NotNull;
 import lombok.SneakyThrows;
 import me.abdiskiosk.usercache.cache.User;
 import me.abdiskiosk.usercache.config.UserCacheConfig;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.mariadb.jdbc.MariaDbDataSource;
 
 import java.sql.Connection;
@@ -58,7 +56,7 @@ public class MySQLStore implements DataStore {
     }
 
     @SneakyThrows
-    protected @Nullable User map(@NotNull ResultSet resultSet) {
+    protected User map(ResultSet resultSet) {
         if(!resultSet.next()) {
             return null;
         }
@@ -90,7 +88,7 @@ public class MySQLStore implements DataStore {
     }
 
     @SneakyThrows
-    public @NotNull List<User> fetch(int size) {
+    public List<User> fetch(int size) {
         try(
                 PreparedStatement stmt = connection.prepareStatement("SELECT uuid, username, skin_texture FROM user_cache ORDER BY last_join DESC LIMIT ?")
         ) {

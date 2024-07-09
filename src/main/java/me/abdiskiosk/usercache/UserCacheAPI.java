@@ -1,6 +1,5 @@
 package me.abdiskiosk.usercache;
 
-import com.sun.istack.internal.NotNull;
 import lombok.Getter;
 import me.abdiskiosk.usercache.cache.User;
 import me.abdiskiosk.usercache.config.UserCacheConfig;
@@ -35,7 +34,7 @@ public class UserCacheAPI {
         plugin.getServer().getPluginManager().registerEvents(new UserCacheEventListener(instance, plugin), plugin);
     }
 
-    public void update(@NotNull Player player) {
+    public void update(Player player) {
         UUID uuid = player.getUniqueId();
         String username = player.getName();
         String texture = getTexture(player);
