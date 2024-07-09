@@ -8,6 +8,7 @@ import me.abdiskiosk.usercache.store.CachedStore;
 import me.abdiskiosk.usercache.store.InMemStore;
 import me.abdiskiosk.usercache.store.MySQLStore;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Method;
 import java.sql.SQLException;
@@ -24,12 +25,14 @@ public class UserCacheAPI {
     @Getter
     private CachedStore cache;
 
-    public static void init(UserCacheConfig config) throws SQLException {
+    public static void init(UserCacheConfig config, Plugin plugin) throws SQLException {
         instance = new UserCacheAPI();
 
         instance.inMemory = new InMemStore();
         instance.mySQL = new MySQLStore(config);
         instance.cache = new CachedStore(instance.inMemory, instance.mySQL, config.getMemCacheSize());
+
+        plugin.getServer().getPluginManager().registerEvents(new UserCacheEventListener(instance, plugin), plugin);
     }
 
     public void update(@NotNull Player player) {
