@@ -5,10 +5,7 @@ import me.abdiskiosk.usercache.cache.User;
 import me.abdiskiosk.usercache.config.UserCacheConfig;
 import org.mariadb.jdbc.MariaDbDataSource;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -81,7 +78,7 @@ public class MySQLStore implements DataStore {
             stmt.setString(1, uuid.toString());
             stmt.setString(2, username);
             stmt.setString(3, skinTexture);
-            stmt.setLong(4, System.currentTimeMillis());
+            stmt.setDate(4, new Date(System.currentTimeMillis()));
 
             stmt.executeUpdate();
         }
