@@ -78,7 +78,7 @@ public class MySQLStore implements DataStore {
             stmt.setString(1, uuid.toString());
             stmt.setString(2, username);
             stmt.setString(3, skinTexture);
-            stmt.setDate(4, new Date(System.currentTimeMillis()));
+            stmt.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
 
             stmt.executeUpdate();
         }
