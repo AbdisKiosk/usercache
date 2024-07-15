@@ -1,11 +1,14 @@
 package me.abdiskiosk.usercache;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import lombok.Getter;
 import me.abdiskiosk.usercache.cache.User;
 import me.abdiskiosk.usercache.config.UserCacheConfig;
 import me.abdiskiosk.usercache.store.CachedStore;
 import me.abdiskiosk.usercache.store.InMemStore;
 import me.abdiskiosk.usercache.store.MySQLStore;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -44,57 +47,16 @@ public class UserCacheAPI {
     }
 
     private String getTexture(Player player) {
-        try {
-            // Get the CraftPlayer class
-            Class<?> craftPlayerClass = Class.forName("org.bukkit.craftbukkit." + getServerVersion() + ".entity.CraftPlayer");
+        CraftPlayer craftPlayer = (CraftPlayer) player;
+        GameProfile profile = craftPlayer.getProfile();
 
-            // Cast the player to CraftPlayer
-            Object craftPlayer = craftPlayerClass.cast(player);
+        Property texture = profile.getProperties().get("textures").stream().findFirst().orElse(null);
 
-            // Get the getHandle method from the CraftPlayer class
-            Method getHandleMethod = craftPlayerClass.getMethod("getHandle");
-            getHandleMethod.setAccessible(true); // Ensure the method is accessible
-
-            // Invoke the getHandle method
-            Object entityPlayer = getHandleMethod.invoke(craftPlayer);
-
-            // Get the GameProfile using reflection
-            Method getProfileMethod = entityPlayer.getClass().getMethod("getProfile");
-            getProfileMethod.setAccessible(true); // Ensure the method is accessible
-            Object gameProfile = getProfileMethod.invoke(entityPlayer);
-
-            // Get the properties map from the GameProfile
-            Method getPropertiesMethod = gameProfile.getClass().getMethod("getProperties");
-            getPropertiesMethod.setAccessible(true); // Ensure the method is accessible
-            Object properties = getPropertiesMethod.invoke(gameProfile);
-
-            // Get the textures property from the properties map
-            Method getMethod = properties.getClass().getMethod("get", Object.class);
-            getMethod.setAccessible(true); // Ensure the method is accessible
-            Object texturesProperty = getMethod.invoke(properties, "textures");
-
-            // Get the iterator of the textures property
-            Method iteratorMethod = texturesProperty.getClass().getMethod("iterator");
-            iteratorMethod.setAccessible(true); // Ensure the method is accessible
-            Object iterator = iteratorMethod.invoke(texturesProperty);
-
-            // Get the next property from the iterator
-            Method nextMethod = iterator.getClass().getMethod("next");
-            nextMethod.setAccessible(true); // Ensure the method is accessible
-            Object property = nextMethod.invoke(iterator);
-
-            // Get the value of the property
-            Method getValueMethod = property.getClass().getMethod("getValue");
-            getValueMethod.setAccessible(true); // Ensure the method is accessible
-            String texture = (String) getValueMethod.invoke(property);
-
-            return texture;
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(texture == null) {
+            return User.NULL_SKIN;
         }
 
-        return User.NULL_SKIN;
+        return texture.getValue();
     }
 
     private String getServerVersion() {

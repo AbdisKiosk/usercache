@@ -14,7 +14,6 @@ import java.util.UUID;
 public class MySQLStore implements DataStore {
 
     private final MariaDbDataSource dataSource;
-    private Connection connection;
 
     public MySQLStore(UserCacheConfig config) throws SQLException {
         this.dataSource = new MariaDbDataSource(
@@ -23,8 +22,10 @@ public class MySQLStore implements DataStore {
 
         dataSource.setUser(config.getUsername());
         dataSource.setPassword(config.getPassword());
+    }
 
-        this.connection = dataSource.getConnection();
+    protected Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
     }
 
 
@@ -32,7 +33,7 @@ public class MySQLStore implements DataStore {
     @Override
     public Optional<User> get(UUID uuid) {
         try(
-                PreparedStatement stmt = connection.prepareStatement("SELECT uuid, username, skin_texture FROM user_cache WHERE uuid = ?")
+                PreparedStatement stmt = getConnection().prepareStatement("SELECT uuid, username, skin_texture FROM user_cache WHERE uuid = ?")
         ) {
             stmt.setString(1, uuid.toString());
 
@@ -44,7 +45,7 @@ public class MySQLStore implements DataStore {
     @Override
     public Optional<User> get(String username) {
         try(
-                PreparedStatement stmt = connection.prepareStatement("SELECT uuid, username, skin_texture FROM user_cache WHERE LOWER(username) = LOWER(?)")
+                PreparedStatement stmt = getConnection().prepareStatement("SELECT uuid, username, skin_texture FROM user_cache WHERE LOWER(username) = LOWER(?)")
         ) {
             stmt.setString(1, username);
 
@@ -69,7 +70,7 @@ public class MySQLStore implements DataStore {
     @Override
     public void update(UUID uuid, String username, String skinTexture) {
         try(
-                PreparedStatement stmt = connection.prepareStatement(
+                PreparedStatement stmt = getConnection().prepareStatement(
                         "INSERT INTO user_cache (uuid, username, skin_texture, last_join) VALUES (?, ?, ?, ?) " +
                                 "ON DUPLICATE KEY UPDATE username = VALUES(username), " +
                                     "skin_texture = VALUES(skin_texture), last_join = VALUES(last_join)"
@@ -87,7 +88,7 @@ public class MySQLStore implements DataStore {
     @SneakyThrows
     public List<User> fetch(int size) {
         try(
-                PreparedStatement stmt = connection.prepareStatement("SELECT uuid, username, skin_texture FROM user_cache ORDER BY last_join DESC LIMIT ?")
+                PreparedStatement stmt = getConnection().prepareStatement("SELECT uuid, username, skin_texture FROM user_cache ORDER BY last_join DESC LIMIT ?")
         ) {
             stmt.setInt(1, size);
 
