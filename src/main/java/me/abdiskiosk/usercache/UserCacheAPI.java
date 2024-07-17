@@ -10,6 +10,7 @@ import me.abdiskiosk.usercache.store.MySQLStore;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -46,14 +47,29 @@ public class UserCacheAPI {
     @SneakyThrows
     private String getTexture(Player player) {
         Class<?> playerClass = Class.forName("org.bukkit.craftbukkit." + getServerVersion() + ".entity.CraftPlayer");
-        Object gameProfile = playerClass.getMethod("getProfile").invoke(player);
+        Method getProfileMethod = playerClass.getMethod("getProfile");
+        getProfileMethod.setAccessible(true); // Make the method accessible
+        Object gameProfile = getProfileMethod.invoke(player);
 
-        Object properties = gameProfile.getClass().getMethod("getProperties").invoke(gameProfile);
-        Object textures = properties.getClass().getMethod("get", Object.class).invoke(properties, "textures");
-        Object iterator = textures.getClass().getMethod("iterator").invoke(textures);
-        Object property = iterator.getClass().getMethod("next").invoke(iterator);
+        Method getPropertiesMethod = gameProfile.getClass().getMethod("getProperties");
+        getPropertiesMethod.setAccessible(true); // Make the method accessible
+        Object properties = getPropertiesMethod.invoke(gameProfile);
 
-        String texture = (String) property.getClass().getMethod("getValue").invoke(property);
+        Method getMethod = properties.getClass().getMethod("get", Object.class);
+        getMethod.setAccessible(true); // Make the method accessible
+        Object textures = getMethod.invoke(properties, "textures");
+
+        Method iteratorMethod = textures.getClass().getMethod("iterator");
+        iteratorMethod.setAccessible(true); // Make the method accessible
+        Object iterator = iteratorMethod.invoke(textures);
+
+        Method nextMethod = iterator.getClass().getMethod("next");
+        nextMethod.setAccessible(true); // Make the method accessible
+        Object property = nextMethod.invoke(iterator);
+
+        Method getValueMethod = property.getClass().getMethod("getValue");
+        getValueMethod.setAccessible(true); // Make the method accessible
+        String texture = (String) getValueMethod.invoke(property);
 
         if(texture == null) {
             return User.NULL_SKIN;
