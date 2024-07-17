@@ -1,7 +1,5 @@
 package me.abdiskiosk.usercache;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import me.abdiskiosk.usercache.cache.User;
@@ -12,9 +10,7 @@ import me.abdiskiosk.usercache.store.MySQLStore;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.omg.IOP.TaggedComponentHelper;
 
-import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.UUID;
 
