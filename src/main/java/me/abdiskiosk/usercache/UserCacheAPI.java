@@ -14,6 +14,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Method;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.UUID;
 
 public class UserCacheAPI {
@@ -47,16 +48,43 @@ public class UserCacheAPI {
     }
 
     private String getTexture(Player player) {
-        CraftPlayer craftPlayer = (CraftPlayer) player;
-        GameProfile profile = craftPlayer.getProfile();
+        try {
+            // Step 1: Obtain the CraftPlayer class and cast the player to CraftPlayer using reflection
+            Class<?> craftPlayerClass = Class.forName("org.bukkit.craftbukkit." + getServerVersion() + ".entity.CraftPlayer");
+            Object craftPlayer = craftPlayerClass.cast(player);
 
-        Property texture = profile.getProperties().get("textures").stream().findFirst().orElse(null);
+            // Step 2: Access the getProfile method of CraftPlayer
+            Method getProfileMethod = craftPlayerClass.getDeclaredMethod("getProfile");
+            getProfileMethod.setAccessible(true);
 
-        if(texture == null) {
-            return User.NULL_SKIN;
+            // Step 3: Invoke getProfile to retrieve the GameProfile
+            Object gameProfile = getProfileMethod.invoke(craftPlayer);
+
+            // Step 4: Access the properties map from the GameProfile
+            Method getPropertiesMethod = gameProfile.getClass().getDeclaredMethod("getProperties");
+            getPropertiesMethod.setAccessible(true);
+            Object properties = getPropertiesMethod.invoke(gameProfile);
+
+            // Assuming properties is a Guava Table or similar collection that has a get method
+            Method getMethod = properties.getClass().getMethod("get", Object.class, Object.class);
+            getMethod.setAccessible(true);
+            Object texturesProperty = getMethod.invoke(properties, "textures", "value");
+
+            // Step 5 & 6: Check if textures property is present and return its value
+            if (texturesProperty != null) {
+                // Assuming texturesProperty is a Collection of Property objects
+                Object texture = ((Collection<?>) texturesProperty).stream().findFirst().orElse(null);
+                if (texture != null) {
+                    // Assuming Property has a getValue method to get the texture value
+                    Method getValueMethod = texture.getClass().getDeclaredMethod("getValue");
+                    getValueMethod.setAccessible(true);
+                    return (String) getValueMethod.invoke(texture);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        return texture.getValue();
+        return User.NULL_SKIN;
     }
 
     private String getServerVersion() {
