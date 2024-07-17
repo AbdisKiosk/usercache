@@ -1,17 +1,21 @@
 package me.abdiskiosk.usercache;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import me.abdiskiosk.usercache.cache.User;
 import me.abdiskiosk.usercache.config.UserCacheConfig;
 import me.abdiskiosk.usercache.store.CachedStore;
 import me.abdiskiosk.usercache.store.InMemStore;
 import me.abdiskiosk.usercache.store.MySQLStore;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.omg.IOP.TaggedComponentHelper;
 
 import java.lang.reflect.Method;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.UUID;
 
 public class UserCacheAPI {
@@ -44,44 +48,23 @@ public class UserCacheAPI {
         cache.update(uuid, username, texture);
     }
 
+    @SneakyThrows
     private String getTexture(Player player) {
-        try {
-            // Step 1: Obtain the CraftPlayer class and cast the player to CraftPlayer using reflection
-            Class<?> craftPlayerClass = Class.forName("org.bukkit.craftbukkit." + getServerVersion() + ".entity.CraftPlayer");
-            Object craftPlayer = craftPlayerClass.cast(player);
+        Class<?> playerClass = Class.forName("org.bukkit.craftbukkit." + getServerVersion() + ".entity.CraftPlayer");
+        Object gameProfile = playerClass.getMethod("getProfile").invoke(player);
 
-            // Step 2: Access the getProfile method of CraftPlayer
-            Method getProfileMethod = craftPlayerClass.getDeclaredMethod("getProfile");
-            getProfileMethod.setAccessible(true);
+        Object properties = gameProfile.getClass().getMethod("getProperties").invoke(gameProfile);
+        Object textures = properties.getClass().getMethod("get", Object.class).invoke(properties, "textures");
+        Object iterator = textures.getClass().getMethod("iterator").invoke(textures);
+        Object property = iterator.getClass().getMethod("next").invoke(iterator);
 
-            // Step 3: Invoke getProfile to retrieve the GameProfile
-            Object gameProfile = getProfileMethod.invoke(craftPlayer);
+        String texture = (String) property.getClass().getMethod("getValue").invoke(property);
 
-            // Step 4: Access the properties map from the GameProfile
-            Method getPropertiesMethod = gameProfile.getClass().getDeclaredMethod("getProperties");
-            getPropertiesMethod.setAccessible(true);
-            Object properties = getPropertiesMethod.invoke(gameProfile);
-
-            // Assuming properties is a Guava Table or similar collection that has a get method
-            Method getMethod = properties.getClass().getMethod("get", Object.class, Object.class);
-            getMethod.setAccessible(true);
-            Object texturesProperty = getMethod.invoke(properties, "textures", "value");
-
-            // Step 5 & 6: Check if textures property is present and return its value
-            if (texturesProperty != null) {
-                // Assuming texturesProperty is a Collection of Property objects
-                Object texture = ((Collection<?>) texturesProperty).stream().findFirst().orElse(null);
-                if (texture != null) {
-                    // Assuming Property has a getValue method to get the texture value
-                    Method getValueMethod = texture.getClass().getDeclaredMethod("getValue");
-                    getValueMethod.setAccessible(true);
-                    return (String) getValueMethod.invoke(texture);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(texture == null) {
+            return User.NULL_SKIN;
         }
-        return User.NULL_SKIN;
+
+        return texture;
     }
 
     private String getServerVersion() {
