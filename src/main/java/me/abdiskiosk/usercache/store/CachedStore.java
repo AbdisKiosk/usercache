@@ -12,12 +12,12 @@ public class CachedStore implements DataStore {
     private final DataStore inMem;
     private final MySQLStore persistent;
 
-    public CachedStore(DataStore inMem, MySQLStore persistent, int size) {
+    public CachedStore(DataStore inMem, MySQLStore persistent) {
         this.inMem = inMem;
         this.persistent = persistent;
 
         long start = System.currentTimeMillis();
-        List<User> users = persistent.fetch(size);
+        List<User> users = persistent.fetchAll();
         long end = System.currentTimeMillis();
 
         Bukkit.getLogger().info("Fetched " + users.size() + " usercache from the database in " + (end - start) + "ms.");

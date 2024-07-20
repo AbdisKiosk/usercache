@@ -45,7 +45,7 @@ public class MySQLStore implements DataStore {
     @Override
     public Optional<User> get(String username) {
         try(
-                PreparedStatement stmt = getConnection().prepareStatement("SELECT uuid, username, skin_texture FROM user_cache WHERE LOWER(username) = LOWER(?)")
+                PreparedStatement stmt = getConnection().prepareStatement("SELECT uuid, username, skin_texture FROM users WHERE LOWER(username) = LOWER(?)")
         ) {
             stmt.setString(1, username);
 
@@ -71,9 +71,9 @@ public class MySQLStore implements DataStore {
     public void update(UUID uuid, String username, String skinTexture) {
         try(
                 PreparedStatement stmt = getConnection().prepareStatement(
-                        "INSERT INTO user_cache (uuid, username, skin_texture, last_join) VALUES (?, ?, ?, ?) " +
+                        "INSERT INTO users (uuid, username, texture) VALUES (?, ?, ?) " +
                                 "ON DUPLICATE KEY UPDATE username = VALUES(username), " +
-                                    "skin_texture = VALUES(skin_texture), last_join = VALUES(last_join)"
+                                    "texture = VALUES(texture), username = VALUES(username)"
                 )
         ) {
             stmt.setString(1, uuid.toString());
@@ -86,12 +86,10 @@ public class MySQLStore implements DataStore {
     }
 
     @SneakyThrows
-    public List<User> fetch(int size) {
+    public List<User> fetchAll() {
         try(
-                PreparedStatement stmt = getConnection().prepareStatement("SELECT uuid, username, skin_texture FROM user_cache ORDER BY last_join DESC LIMIT ?")
+                PreparedStatement stmt = getConnection().prepareStatement("SELECT uuid, username, texture FROM users")
         ) {
-            stmt.setInt(1, size);
-
             List<User> users = new ArrayList<>();
             ResultSet res = stmt.executeQuery();
             while(true) {

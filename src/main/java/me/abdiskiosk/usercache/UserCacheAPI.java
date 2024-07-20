@@ -31,7 +31,7 @@ public class UserCacheAPI {
 
         instance.inMemory = new InMemStore();
         instance.mySQL = new MySQLStore(config);
-        instance.cache = new CachedStore(instance.inMemory, instance.mySQL, config.getMemCacheSize());
+        instance.cache = new CachedStore(instance.inMemory, instance.mySQL);
 
         plugin.getServer().getPluginManager().registerEvents(new UserCacheEventListener(instance, plugin), plugin);
     }

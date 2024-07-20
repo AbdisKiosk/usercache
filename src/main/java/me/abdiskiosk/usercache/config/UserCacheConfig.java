@@ -12,8 +12,6 @@ public class UserCacheConfig {
     private final String password;
     private final String database;
 
-    private final int memCacheSize;
-
     @Override
     public String toString() {
         return "UserCacheConfig{" +
@@ -22,7 +20,6 @@ public class UserCacheConfig {
                 ", username='" + username + '\'' +
                 ", password='" + "(hidden)" + '\'' +
                 ", database='" + database + '\'' +
-                ", memCacheSize=" + memCacheSize +
                 '}';
     }
 }
