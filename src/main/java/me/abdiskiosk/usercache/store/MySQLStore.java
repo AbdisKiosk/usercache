@@ -33,7 +33,7 @@ public class MySQLStore implements DataStore {
     @Override
     public Optional<User> get(UUID uuid) {
         try(
-                PreparedStatement stmt = getConnection().prepareStatement("SELECT uuid, username, skin_texture FROM user_cache WHERE uuid = ?")
+                PreparedStatement stmt = getConnection().prepareStatement("SELECT uuid, username, texture FROM users WHERE uuid = ?")
         ) {
             stmt.setString(1, uuid.toString());
 
@@ -45,7 +45,7 @@ public class MySQLStore implements DataStore {
     @Override
     public Optional<User> get(String username) {
         try(
-                PreparedStatement stmt = getConnection().prepareStatement("SELECT uuid, username, skin_texture FROM users WHERE LOWER(username) = LOWER(?)")
+                PreparedStatement stmt = getConnection().prepareStatement("SELECT uuid, username, texture FROM users WHERE LOWER(username) = LOWER(?)")
         ) {
             stmt.setString(1, username);
 
@@ -61,7 +61,7 @@ public class MySQLStore implements DataStore {
 
         UUID uuid = UUID.fromString(resultSet.getString("uuid"));
         String username = resultSet.getString("username");
-        String skinTexture = resultSet.getString("skin_texture");
+        String skinTexture = resultSet.getString("texture");
 
         return new User(uuid, username, skinTexture);
     }
