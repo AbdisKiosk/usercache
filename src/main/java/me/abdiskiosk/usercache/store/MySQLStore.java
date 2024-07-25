@@ -2,9 +2,8 @@ package me.abdiskiosk.usercache.store;
 
 import lombok.SneakyThrows;
 import me.abdiskiosk.usercache.cache.User;
-import me.abdiskiosk.usercache.config.UserCacheConfig;
-import org.mariadb.jdbc.MariaDbDataSource;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,15 +12,10 @@ import java.util.UUID;
 
 public class MySQLStore implements DataStore {
 
-    private final MariaDbDataSource dataSource;
+    private final DataSource dataSource;
 
-    public MySQLStore(UserCacheConfig config) throws SQLException {
-        this.dataSource = new MariaDbDataSource(
-                "jdbc:mariadb://" + config.getHost() + ":" + config.getPort() + "/" + config.getDatabase()
-        );
-
-        dataSource.setUser(config.getUsername());
-        dataSource.setPassword(config.getPassword());
+    public MySQLStore(DataSource dataSource) throws SQLException {
+        this.dataSource = dataSource;
     }
 
     protected Connection getConnection() throws SQLException {

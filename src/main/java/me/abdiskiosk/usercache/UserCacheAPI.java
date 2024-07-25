@@ -1,11 +1,11 @@
 package me.abdiskiosk.usercache;
 
 import lombok.Getter;
-import me.abdiskiosk.usercache.config.UserCacheConfig;
 import me.abdiskiosk.usercache.store.CachedStore;
 import me.abdiskiosk.usercache.store.InMemStore;
 import me.abdiskiosk.usercache.store.MySQLStore;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -21,11 +21,11 @@ public class UserCacheAPI {
     @Getter
     private CachedStore cache;
 
-    public static void init(UserCacheConfig config) throws SQLException {
+    public static void init(DataSource dataSource) throws SQLException {
         instance = new UserCacheAPI();
 
         instance.inMemory = new InMemStore();
-        instance.mySQL = new MySQLStore(config);
+        instance.mySQL = new MySQLStore(dataSource);
         instance.cache = new CachedStore(instance.inMemory, instance.mySQL);
     }
 
