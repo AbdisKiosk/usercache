@@ -1,6 +1,8 @@
 package me.abdiskiosk.usercache;
 
+import com.sun.istack.internal.NotNull;
 import lombok.Getter;
+import me.abdiskiosk.usercache.cache.User;
 import me.abdiskiosk.usercache.store.CachedStore;
 import me.abdiskiosk.usercache.store.InMemStore;
 import me.abdiskiosk.usercache.store.MySQLStore;
@@ -31,6 +33,17 @@ public class UserCacheAPI {
 
     public void updateCache(UUID uuid) {
         mySQL.get(uuid).ifPresent(user -> inMemory.update(user.getUuid(), user.getUsername(), user.getSkinTexture()));
+    }
+
+    public static @NotNull String getTexture(@NotNull UUID uuid) {
+        return getOrDefault(uuid).getSkinTexture();
+    }
+
+    public static @NotNull String getName(@NotNull UUID uuid) {
+        return getOrDefault(uuid).getUsername();
+    }
+    public static @NotNull User getOrDefault(@NotNull UUID uuid) {
+        return getInstance().getInMemory().getOrDefault(uuid);
     }
 
 }
