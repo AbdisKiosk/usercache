@@ -1,7 +1,7 @@
 package me.abdiskiosk.usercache;
 
-import com.sun.istack.internal.NotNull;
 import lombok.Getter;
+import lombok.NonNull;
 import me.abdiskiosk.usercache.cache.User;
 import me.abdiskiosk.usercache.store.CachedStore;
 import me.abdiskiosk.usercache.store.InMemStore;
@@ -23,7 +23,7 @@ public class UserCacheAPI {
     @Getter
     private CachedStore cache;
 
-    public static void init(DataSource dataSource) throws SQLException {
+    public static void init(@NonNull DataSource dataSource) throws SQLException {
         instance = new UserCacheAPI();
 
         instance.inMemory = new InMemStore();
@@ -31,18 +31,18 @@ public class UserCacheAPI {
         instance.cache = new CachedStore(instance.inMemory, instance.mySQL);
     }
 
-    public void updateCache(UUID uuid) {
+    public void updateCache(@NonNull UUID uuid) {
         mySQL.get(uuid).ifPresent(user -> inMemory.update(user.getUuid(), user.getUsername(), user.getSkinTexture()));
     }
 
-    public static @NotNull String getTexture(@NotNull UUID uuid) {
+    public static @NonNull String getTexture(@NonNull UUID uuid) {
         return getOrDefault(uuid).getSkinTexture();
     }
 
-    public static @NotNull String getName(@NotNull UUID uuid) {
+    public static @NonNull String getName(@NonNull UUID uuid) {
         return getOrDefault(uuid).getUsername();
     }
-    public static @NotNull User getOrDefault(@NotNull UUID uuid) {
+    public static @NonNull User getOrDefault(@NonNull UUID uuid) {
         return getInstance().getInMemory().getOrDefault(uuid);
     }
 
