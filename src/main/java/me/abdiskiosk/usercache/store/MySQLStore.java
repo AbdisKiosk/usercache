@@ -27,7 +27,8 @@ public class MySQLStore implements DataStore {
     @Override
     public Optional<User> get(UUID uuid) {
         try(
-                PreparedStatement stmt = getConnection().prepareStatement("SELECT uuid, username, texture FROM users WHERE uuid = ?")
+                Connection connection = getConnection();
+                PreparedStatement stmt = connection.prepareStatement("SELECT uuid, username, texture FROM users WHERE uuid = ?")
         ) {
             stmt.setString(1, uuid.toString());
 
@@ -39,7 +40,8 @@ public class MySQLStore implements DataStore {
     @Override
     public Optional<User> get(String username) {
         try(
-                PreparedStatement stmt = getConnection().prepareStatement("SELECT uuid, username, texture FROM users WHERE LOWER(username) = LOWER(?)")
+                Connection connection = getConnection();
+                PreparedStatement stmt = connection.prepareStatement("SELECT uuid, username, texture FROM users WHERE LOWER(username) = LOWER(?)")
         ) {
             stmt.setString(1, username);
 
@@ -64,7 +66,8 @@ public class MySQLStore implements DataStore {
     @Override
     public void update(UUID uuid, String username, String skinTexture) {
         try(
-                PreparedStatement stmt = getConnection().prepareStatement(
+                Connection connection = getConnection();
+                PreparedStatement stmt = connection.prepareStatement(
                         "INSERT INTO users (uuid, username, texture) VALUES (?, ?, ?) " +
                                 "ON DUPLICATE KEY UPDATE username = VALUES(username), " +
                                     "texture = VALUES(texture), username = VALUES(username)"
@@ -81,7 +84,8 @@ public class MySQLStore implements DataStore {
     @SneakyThrows
     public List<User> fetchAll() {
         try(
-                PreparedStatement stmt = getConnection().prepareStatement("SELECT uuid, username, texture FROM users")
+                Connection connection = getConnection();
+                PreparedStatement stmt = connection.prepareStatement("SELECT uuid, username, texture FROM users")
         ) {
             List<User> users = new ArrayList<>();
             ResultSet res = stmt.executeQuery();
